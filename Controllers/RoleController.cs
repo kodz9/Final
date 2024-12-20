@@ -1,6 +1,6 @@
 ﻿using Final.Models;
 using Microsoft.AspNetCore.Mvc;
-
+//yzy///
 namespace Final.Controllers
 {
     [Route("api/[controller]")]
@@ -27,7 +27,7 @@ namespace Final.Controllers
                 data
             });
         }
-
+        
         [HttpDelete("{id}")]
         public IActionResult DeleteRole(int id)
         {
