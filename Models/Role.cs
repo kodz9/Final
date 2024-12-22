@@ -7,7 +7,9 @@ namespace Final.Models
         public int Id { get; set; }
         public string? Description { get; set; }
         public string? RoleName { get; set; }
-        public string? permission_ids { get; set; }
+
+        public string? PermissionIds { get; set; }
+        public int Deleted { get; set; }
 
     }
 }

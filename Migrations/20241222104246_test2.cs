@@ -5,11 +5,25 @@
 namespace Final.Migrations
 {
     /// <inheritdoc />
-    public partial class test1 : Migration
+    public partial class test2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Departments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    DepartmentName = table.Column<string>(type: "TEXT", nullable: true),
+                    Deleted = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Departments", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Permissions",
                 columns: table => new
@@ -31,7 +45,8 @@ namespace Final.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Description = table.Column<string>(type: "TEXT", nullable: true),
                     RoleName = table.Column<string>(type: "TEXT", nullable: true),
-                    permission_ids = table.Column<string>(type: "TEXT", nullable: true)
+                    PermissionIds = table.Column<string>(type: "TEXT", nullable: true),
+                    Deleted = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -49,11 +64,13 @@ namespace Final.Migrations
                     RealName = table.Column<string>(type: "TEXT", nullable: true),
                     UserName = table.Column<string>(type: "TEXT", nullable: true),
                     Gender = table.Column<string>(type: "TEXT", nullable: true),
-                    RootDepartId = table.Column<int>(type: "INTEGER", nullable: false),
                     Department = table.Column<string>(type: "TEXT", nullable: true),
                     Address = table.Column<string>(type: "TEXT", nullable: true),
                     Birthday = table.Column<string>(type: "TEXT", nullable: true),
-                    role_ids = table.Column<string>(type: "TEXT", nullable: true)
+                    RoleIds = table.Column<string>(type: "TEXT", nullable: true),
+                    Deleted = table.Column<int>(type: "INTEGER", nullable: true),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false),
+                    Password = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -64,6 +81,9 @@ namespace Final.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Departments");
+
             migrationBuilder.DropTable(
                 name: "Permissions");
 

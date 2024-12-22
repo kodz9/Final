@@ -10,14 +10,31 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Final.Migrations
 {
     [DbContext(typeof(WebContext))]
-    [Migration("20241213082325_test1")]
-    partial class test1
+    [Migration("20241222104246_test2")]
+    partial class test2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
+
+            modelBuilder.Entity("Final.Models.Department", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Deleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("DepartmentName")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Departments");
+                });
 
             modelBuilder.Entity("Final.Models.Permission", b =>
                 {
@@ -39,13 +56,16 @@ namespace Final.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("Deleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("RoleName")
+                    b.Property<string>("PermissionIds")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("permission_ids")
+                    b.Property<string>("RoleName")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -65,6 +85,9 @@ namespace Final.Migrations
                     b.Property<string>("Birthday")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("Deleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Department")
                         .HasColumnType("TEXT");
 
@@ -77,16 +100,21 @@ namespace Final.Migrations
                     b.Property<string>("Mobile")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("RealName")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("RootDepartId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("UserName")
+                    b.Property<string>("RoleIds")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("role_ids")
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserName")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
