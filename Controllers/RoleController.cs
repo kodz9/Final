@@ -53,5 +53,42 @@ namespace Final.Controllers
             });
         }
 
+        [HttpPost]
+        public IActionResult AddRole(Role role)
+        {
+            ctx.Roles.Add(role);
+            ctx.SaveChanges();
+            return Json(new
+            {
+                success = true,
+                msg = "Role added successfully"
+            });
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateRole(int id, Role updatedRole)
+        {
+            var role = ctx.Roles.FirstOrDefault(x => x.Id == id);
+            if (role == null)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    msg = $"Role with ID {id} not found"
+                });
+            }
+
+            role.Description = updatedRole.Description;
+            role.RoleName = updatedRole.RoleName;
+            //role.permission_ids = updatedRole.permission_ids;
+            ctx.SaveChanges();
+
+            return Ok(new
+            {
+                success = true,
+                msg = $"Role with ID {id} has been updated"
+            });
+        }
+
     }
 }

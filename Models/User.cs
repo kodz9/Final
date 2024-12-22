@@ -12,7 +12,8 @@
         public string? Department { get; set; }
         public string? Address { get; set; }
         public string? Birthday { get; set; }
-        public string? role_ids { get; set; }
+        public string? RoleIds { get; set; }
+        public int? Deleted { get; set; }
 
     }
 }
