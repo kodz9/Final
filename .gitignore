@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Migrations/20241222104246_test2.cs
+/Models/RolePermission.cs
+/Models/UserRole.cs
+/Migrations/20241222104246_test2.cs
+/Migrations/20241222104246_test2.cs
+/Migrations/20241222104246_test2.Designer.cs
