@@ -42,14 +42,30 @@ app.UseAuthorization();
 
 app.Use(async (ctx, next) =>
 {
-    string token = ctx.Request.Query["token"].ToString();
-    Dictionary<string, User> users = UserService.Instance.Users; 
-    if (users.TryGetValue(token, out User? user))
+    // 检查请求路径
+    var path = ctx.Request.Path.Value;
+    if (path == "/api/User/login" || path == "/api/User/logout")
     {
-        ctx.Features.Set<User>(user);
+        // 对于登录和登出请求，直接继续处理
+        await next();
+        return;
     }
+
+    // 对其他请求进行token验证
+    string token = ctx.Request.Query["token"].ToString();
+    var user = UserService.Instance.GetUserByToken(token);
+    if (user == null)
+    {
+        ctx.Response.StatusCode = 401; // Unauthorized
+        await ctx.Response.WriteAsync("Unauthorized");
+        return;
+    }
+
+    ctx.Features.Set<User>(user);
     await next();
 });
+
+app.UseAuthorization();
 
 app.MapControllers();
 

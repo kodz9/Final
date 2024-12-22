@@ -8,7 +8,7 @@ namespace Final.Controllers
     public class DepartmentController(WebContext ctx) : Controller
     {
         [HttpGet("{id}")]
-        public IActionResult GetDepartment(int id)
+        public IActionResult GetDepartment(int id, [FromQuery] string token)
         {
             var department = ctx.Departments.FirstOrDefault(x => x.Id == id);
             if (department == null)
@@ -23,7 +23,7 @@ namespace Final.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddDepartment(Department department)
+        public IActionResult AddDepartment(Department department, [FromQuery] string token)
         {
             ctx.Departments.Add(department);
             ctx.SaveChanges();
@@ -35,7 +35,7 @@ namespace Final.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateDepartment(int id, Department updatedDepartment)
+        public IActionResult UpdateDepartment(int id, Department updatedDepartment, [FromQuery] string token)
         {
             var department = ctx.Departments.FirstOrDefault(x => x.Id == id);
             if (department == null)
@@ -58,7 +58,7 @@ namespace Final.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteDepartment(int id)
+        public IActionResult DeleteDepartment(int id, [FromQuery] string token)
         {
             var department = ctx.Departments.FirstOrDefault(x => x.Id == id);
             if (department == null)

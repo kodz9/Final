@@ -1,4 +1,5 @@
-﻿ using Final.Models;
+﻿using Final.Models;
+using Final.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Linq;
@@ -9,28 +10,16 @@ namespace Final.Controllers
     [ApiController]
     public class UserController(WebContext ctx) : Controller
     {
-        public User? user;
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            user = context.HttpContext.Features.Get<User>();
-            if (user == null)
-            {
-                context.Result = Json(new
-                {
+        private User? user;
 
-                });
-            }
-
-            base.OnActionExecuting(context);
-        }
-
+       
         [HttpGet("{id}")]
-        public IActionResult GetUser(int id)
+        public IActionResult GetUser(int id, [FromQuery] string token)
         {
             var user = ctx.Users.FirstOrDefault(x => x.Id == id);
             if (user == null)
             {
-                return Json(new
+                return NotFound(new
                 {
                     success = false,
                     msg = $"{id} not found"
@@ -40,24 +29,35 @@ namespace Final.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddUser(User user)
+        public IActionResult AddUser(User user, [FromQuery] string token)
         {
-            ctx.Users.Add(user);
-            ctx.SaveChanges();
-            return Ok(new
+            try
             {
-                success = true,
-                msg = "User added successfully"
-            });
+                ctx.Users.Add(user);
+                ctx.SaveChanges();
+                return Ok(new
+                {
+                    success = true,
+                    msg = "User added successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    msg = ex.Message
+                });
+            }
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateUser(int id, User updatedUser)
+        public IActionResult UpdateUser(int id, User updatedUser, [FromQuery] string token)
         {
             var user = ctx.Users.FirstOrDefault(x => x.Id == id);
             if (user == null)
             {
-                return Json(new
+                return NotFound(new
                 {
                     success = false,
                     msg = $"User with ID {id} not found"
@@ -69,11 +69,11 @@ namespace Final.Controllers
             user.RealName = updatedUser.RealName;
             user.UserName = updatedUser.UserName;
             user.Gender = updatedUser.Gender;
- 
             user.Department = updatedUser.Department;
             user.Address = updatedUser.Address;
             user.Birthday = updatedUser.Birthday;
             //user.roleIds = updatedUser.roleIds;
+
             ctx.SaveChanges();
 
             return Ok(new
@@ -84,12 +84,12 @@ namespace Final.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteUser(int id)
+        public IActionResult DeleteUser(int id, [FromQuery] string token)
         {
             var user = ctx.Users.FirstOrDefault(x => x.Id == id);
             if (user == null)
             {
-                return Json(new
+                return NotFound(new
                 {
                     success = false,
                     msg = $"User with ID {id} not found"
@@ -107,15 +107,25 @@ namespace Final.Controllers
         }
 
         [HttpGet("search")]
-        public IActionResult SearchUsersByName(string name)
+        public IActionResult SearchUsersByName(string name, [FromQuery] string token)
         {
+            var user = HttpContext.Features.Get<User>();
+            if (user == null)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    msg = "Unauthorized"
+                });
+            }
+
             var users = ctx.Users
                 .Where(x => x.UserName.Contains(name))
                 .ToList();
 
             if (!users.Any())
             {
-                return Json(new
+                return NotFound(new
                 {
                     success = false,
                     msg = $"No users found with name containing '{name}'"
@@ -126,6 +136,38 @@ namespace Final.Controllers
             {
                 success = true,
                 data = users
+            });
+        }
+
+        [HttpPost("login")]
+        public IActionResult Login([FromForm] string userName, [FromForm] string password)
+        {
+            var user = ctx.Users.FirstOrDefault(u => u.UserName == userName && u.Password == password);
+            if (user == null)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    msg = "Invalid username or password"
+                });
+            }
+
+            string token = UserService.Instance.GenerateToken(user);
+            return Ok(new
+            {
+                success = true,
+                token = token
+            });
+        }
+
+        [HttpPost("logout")]
+        public IActionResult Logout([FromForm] string token)
+        {
+            UserService.Instance.RemoveToken(token);
+            return Ok(new
+            {
+                success = true,
+                msg = "User logged out successfully"
             });
         }
     }

@@ -9,7 +9,7 @@ namespace Final.Controllers
     {
         //GET:api/roles/GetRoleSchema
         [HttpGet("{id}")]
-        public IActionResult GetRole(int id)
+        public IActionResult GetRole(int id, [FromQuery] string token)
         {
             Role data = ctx.Roles.FirstOrDefault(x => x.Id == id);
             if (data == null)
@@ -29,7 +29,7 @@ namespace Final.Controllers
         }
         
         [HttpDelete("{id}")]
-        public IActionResult DeleteRole(int id)
+        public IActionResult DeleteRole(int id, [FromQuery] string token)
         {
             // 查找角色
             var role = ctx.Roles.FirstOrDefault(x => x.Id == id);
@@ -54,7 +54,7 @@ namespace Final.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddRole(Role role)
+        public IActionResult AddRole(Role role, [FromQuery] string token)
         {
             ctx.Roles.Add(role);
             ctx.SaveChanges();
@@ -66,8 +66,9 @@ namespace Final.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateRole(int id, Role updatedRole)
+        public IActionResult UpdateRole(int id, Role updatedRole, [FromQuery] string token)
         {
+            // 查找角色
             var role = ctx.Roles.FirstOrDefault(x => x.Id == id);
             if (role == null)
             {
@@ -77,10 +78,10 @@ namespace Final.Controllers
                     msg = $"Role with ID {id} not found"
                 });
             }
-
+            // 更新角色信息
             role.Description = updatedRole.Description;
             role.RoleName = updatedRole.RoleName;
-            //role.permission_ids = updatedRole.permission_ids;
+            // role.permission_ids = updatedRole.permission_ids;
             ctx.SaveChanges();
 
             return Ok(new

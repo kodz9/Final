@@ -8,7 +8,7 @@ namespace Final.Controllers
     public class PermissionController(WebContext ctx) : Controller
     {
         [HttpGet("{id}")]
-        public IActionResult GetPermission(int id)
+        public IActionResult GetPermission(int id, [FromQuery] string token)
         {
             var permission = ctx.Permissions.FirstOrDefault(x => x.Id == id);
             if (permission == null)
@@ -23,7 +23,7 @@ namespace Final.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddPermission(Permission permission)
+        public IActionResult AddPermission(Permission permission, [FromQuery] string token)
         {
             ctx.Permissions.Add(permission);
             ctx.SaveChanges();
@@ -35,7 +35,7 @@ namespace Final.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdatePermission(int id, Permission updatedPermission)
+        public IActionResult UpdatePermission(int id, Permission updatedPermission, [FromQuery] string token)
         {
             var permission = ctx.Permissions.FirstOrDefault(x => x.Id == id);
             if (permission == null)
@@ -58,7 +58,7 @@ namespace Final.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeletePermission(int id)
+        public IActionResult DeletePermission(int id, [FromQuery] string token)
         {
             var permission = ctx.Permissions.FirstOrDefault(x => x.Id == id);
             if (permission == null)
