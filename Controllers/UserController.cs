@@ -10,9 +10,30 @@ namespace Final.Controllers
     [ApiController]
     public class UserController(WebContext ctx) : Controller
     {
-        private User? user;
+        public User? user;
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            user = context.HttpContext.Features.Get<User>();
+            if (user == null)
+            {
+                context.Result = Json(new
+                {
+<<<<<<<<< Temporary merge branch 1
+                    success = false,
+                    msg = "User not found"
+=========
+<<<<<<<<< Temporary merge branch 1
+                    success = false,
+                    msg = "User not found"
+=========
 
-       
+>>>>>>>>> Temporary merge branch 2
+                });
+            }
+
+            base.OnActionExecuting(context);
+        }
+
         [HttpGet("{id}")]
         public IActionResult GetUser(int id, [FromQuery] string token)
         {
@@ -69,6 +90,11 @@ namespace Final.Controllers
             user.RealName = updatedUser.RealName;
             user.UserName = updatedUser.UserName;
             user.Gender = updatedUser.Gender;
+<<<<<<<<< Temporary merge branch 1
+            user.RootDepartId = updatedUser.RootDepartId;
+=========
+ 
+>>>>>>>>> Temporary merge branch 2
             user.Department = updatedUser.Department;
             user.Address = updatedUser.Address;
             user.Birthday = updatedUser.Birthday;
