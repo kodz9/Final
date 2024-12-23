@@ -10,12 +10,8 @@ namespace Final.Controllers
     [ApiController]
     public class UserController(WebContext ctx) : Controller
     {
-
-
         private User? user;
-
-
-
+       
         [HttpGet("{id}")]
         public IActionResult GetUser(int id, [FromQuery] string token)
         {
@@ -72,10 +68,6 @@ namespace Final.Controllers
             user.RealName = updatedUser.RealName;
             user.UserName = updatedUser.UserName;
             user.Gender = updatedUser.Gender;
-    
-
- 
-
             user.Department = updatedUser.Department;
             user.Address = updatedUser.Address;
             user.Birthday = updatedUser.Birthday;
