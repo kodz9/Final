@@ -1,15 +1,29 @@
 using Final.Models;
+using Final.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Final.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DepartmentController(WebContext ctx) : Controller
+    public class DepartmentController(WebContext ctx,PermissionService _permissionService) : Controller
     {
         [HttpGet("{id}")]
-        public IActionResult GetDepartment(int id, [FromQuery] string token)
+        public IActionResult GetDepartment(int id)
         {
+            var user = HttpContext.Features.Get<User>();
+            if (user == null)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    msg = "Unauthorized"
+                });
+            }
+            if (!_permissionService.HasPermission(user, "view_department")) // 权限需要自定义
+            {
+                return Unauthorized(new { success = false, msg = "You don't have permission to view departments" });
+            }
             var department = ctx.Departments.FirstOrDefault(x => x.Id == id);
             if (department == null)
             {
@@ -25,6 +39,19 @@ namespace Final.Controllers
         [HttpPost]
         public IActionResult AddDepartment(Department department, [FromQuery] string token)
         {
+            var user = HttpContext.Features.Get<User>();
+            if (user == null)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    msg = "Unauthorized"
+                });
+            }
+            if (!_permissionService.HasPermission(user, "add_department")) // 权限需要自定义
+            {
+                return Unauthorized(new { success = false, msg = "You don't have permission to add departments" });
+            }
             ctx.Departments.Add(department);
             ctx.SaveChanges();
             return Ok(new
@@ -37,6 +64,19 @@ namespace Final.Controllers
         [HttpPut("{id}")]
         public IActionResult UpdateDepartment(int id, Department updatedDepartment, [FromQuery] string token)
         {
+            var user = HttpContext.Features.Get<User>();
+            if (user == null)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    msg = "Unauthorized"
+                });
+            }
+            if (!_permissionService.HasPermission(user, "update_department")) // 权限需要自定义
+            {
+                return Unauthorized(new { success = false, msg = "You don't have permission to update departments" });
+            }
             var department = ctx.Departments.FirstOrDefault(x => x.Id == id);
             if (department == null)
             {
@@ -60,6 +100,19 @@ namespace Final.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteDepartment(int id, [FromQuery] string token)
         {
+            var user = HttpContext.Features.Get<User>();
+            if (user == null)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    msg = "Unauthorized"
+                });
+            }
+            if (!_permissionService.HasPermission(user, "delete_department")) // 权限需要自定义
+            {
+                return Unauthorized(new { success = false, msg = "You don't have permission to delete departments" });
+            }
             var department = ctx.Departments.FirstOrDefault(x => x.Id == id);
             if (department == null)
             {

@@ -2,23 +2,48 @@ using Final.Models;
 using Final.Service;
 using Microsoft.EntityFrameworkCore;
 using SQLitePCL;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<PermissionService>();
+builder.Services.AddSwaggerGen(c =>
+{
+    // 配置 Swagger 支持 Bearer Token
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter your Bearer token"
+    });
+
+    // 配置 Swagger UI 显示 Bearer Token 输入框
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        }
+    });
+});
 
 builder.Services.AddDbContext<WebContext>(opt =>
 {
     opt.UseSqlite("Data Source = D:\\database.db");
 });
-
 
 var app = builder.Build();
 
@@ -51,8 +76,18 @@ app.Use(async (ctx, next) =>
         return;
     }
 
-    // 对其他请求进行token验证
-    string token = ctx.Request.Query["token"].ToString();
+    // 从请求头的 Authorization 中获取 Token
+    string token = ctx.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+    // 如果 token 不存在，返回 Unauthorized
+    if (string.IsNullOrEmpty(token))
+    {
+        ctx.Response.StatusCode = 401; // Unauthorized
+        await ctx.Response.WriteAsync("Unauthorized");
+        return;
+    }
+
+    // 通过 Token 获取用户
     var user = UserService.Instance.GetUserByToken(token);
     if (user == null)
     {
@@ -61,6 +96,7 @@ app.Use(async (ctx, next) =>
         return;
     }
 
+    // 设置用户信息到请求的特性中，供后续中间件或控制器使用
     ctx.Features.Set<User>(user);
     await next();
 });

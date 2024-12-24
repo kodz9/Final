@@ -1,16 +1,31 @@
 ﻿using Final.Models;
+using Final.Service;
 using Microsoft.AspNetCore.Mvc;
 //yzy///////
 namespace Final.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RoleController(WebContext ctx) : Controller
+    public class RoleController(WebContext ctx, PermissionService _permissionService) : Controller
     {
         //GET:api/roles/GetRoleSchema
-        [HttpGet("{id}")]
-        public IActionResult GetRole(int id, [FromQuery] string token)
+        [HttpGet("{id}/GetRoleById")]
+        public IActionResult GetRole(int id)
         {
+            var user = HttpContext.Features.Get<User>();
+            if (user == null)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    msg = "Unauthorized"
+                });
+            }
+
+            if (!_permissionService.HasPermission(user, "view_role")) // 权限需要自定义
+            {
+                return Unauthorized(new { success = false, msg = "You don't have permission to view roles" });
+            }
             Role data = ctx.Roles.FirstOrDefault(x => x.Id == id);
             if (data == null)
             {
@@ -29,8 +44,22 @@ namespace Final.Controllers
         }
         
         [HttpDelete("{id}")]
-        public IActionResult DeleteRole(int id, [FromQuery] string token)
+        public IActionResult DeleteRole(int id)
         {
+            var user = HttpContext.Features.Get<User>();
+            if (user == null)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    msg = "Unauthorized"
+                });
+            }
+
+            if (!_permissionService.HasPermission(user, "delete_role")) // 权限需要自定义
+            {
+                return Unauthorized(new { success = false, msg = "You don't have permission to delete roles" });
+            }
             // 查找角色
             var role = ctx.Roles.FirstOrDefault(x => x.Id == id);
             if (role == null)
@@ -54,8 +83,22 @@ namespace Final.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddRole(Role role, [FromQuery] string token)
+        public IActionResult AddRole(Role role)
         {
+            var user = HttpContext.Features.Get<User>();
+            if (user == null)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    msg = "Unauthorized"
+                });
+            }
+
+            if (!_permissionService.HasPermission(user, "add_role")) // 权限需要自定义
+            {
+                return Unauthorized(new { success = false, msg = "You don't have permission to add roles" });
+            }
             ctx.Roles.Add(role);
             ctx.SaveChanges();
             return Json(new
@@ -66,8 +109,22 @@ namespace Final.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateRole(int id, Role updatedRole, [FromQuery] string token)
+        public IActionResult UpdateRole(int id, Role updatedRole)
         {
+            var user = HttpContext.Features.Get<User>();
+            if (user == null)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    msg = "Unauthorized"
+                });
+            }
+
+            if (!_permissionService.HasPermission(user, "update_role")) // 权限需要自定义
+            {
+                return Unauthorized(new { success = false, msg = "You don't have permission to update_role" });
+            }
             // 查找角色
             var role = ctx.Roles.FirstOrDefault(x => x.Id == id);
             if (role == null)
