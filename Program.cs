@@ -69,9 +69,9 @@ app.Use(async (ctx, next) =>
 {
     // 检查请求路径
     var path = ctx.Request.Path.Value;
-    if (path == "/api/User/login" || path == "/api/User/logout")
+    if (path == "/api/User/login" || path == "/api/User/logout"||path == "/api/User/register")
     {
-        // 对于登录和登出请求，直接继续处理
+        // 对于登录和登出，注册请求，直接继续处理
         await next();
         return;
     }
